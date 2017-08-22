@@ -1,0 +1,880 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="
+        http://www.springframework.org/schema/beans 
+        http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+        http://www.springframework.org/schema/mvc 
+        http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd
+        http://www.springframework.org/schema/context 
+        http://www.springframework.org/schema/context/spring-context-3.0.xsd
+        http://www.springframework.org/schema/tx
+        http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
+      http://www.springframework.org/schema/aop
+      http://www.springframework.org/schema/aop/spring-aop-3.0.xsd"
+	default-autowire="byName">
+	
+	<!-- 工作的bean -->
+	<bean id="taskAllocation" class="com.bqjr.job.TaskAllocation"/>
+	<bean id="subTask" class="com.bqjr.job.SubTask"/>
+	<bean id="subTaskA" class="com.bqjr.job.SubTaskA"/>
+	<bean id="subTaskB" class="com.bqjr.job.SubTaskB"/>
+	<bean id="subTaskC" class="com.bqjr.job.SubTaskC"/>
+	<bean id="subTaskD" class="com.bqjr.job.SubTaskD"/>
+	<bean id="changekftTask" class="com.bqjr.job.ChangekftTask"></bean>
+	<bean id="contractkftTask" class="com.bqjr.job.ContractkftTask"></bean>
+	<bean id="icbcBatchChargeTask" class="com.bqjr.job.icbc.ICBCBatchChargeTask"></bean>
+	<!--维护job  -->
+	<bean id="vindicateJobTask" class="com.bqjr.job.VindicateJobTask"></bean>
+	<!-- job的配置开始 -->
+	<bean id="withholdHistoryJob" class="com.bqjr.job.WithholdHistoryJob" />
+	<bean id="acpHhSendTask" class="com.bqjr.job.AcpHhSendTask" />
+	<bean id="acpHhSendTask2" class="com.bqjr.job.AcpHhSendTask2" />
+	<bean id="acpHhSendTask3" class="com.bqjr.job.AcpHhSendTask3" />
+	<bean id="acpHhReceiveTask" class="com.bqjr.job.AcpHhReceiveTask" />
+	<bean id="kftBatchChargeTask" class="com.bqjr.job.KFTBatchChargeTask" />
+	<bean id="EBUFChargeTask" class="com.bqjr.job.EBUFChargeTask" />
+	<bean id="acpTfbTask" class="com.bqjr.job.AcpTfbTask" />
+	<bean id="acpTfbQueryTask" class="com.bqjr.job.AcpTfbQueryTask" />
+	<bean id="acpTfbExceptionTask" class="com.bqjr.job.AcpTfbExceptionTask" />
+	<bean id="synSystemConfigTask" class="com.bqjr.job.SynSystemConfigTask" />
+	<bean id="icbcDetailQueryTask" class="com.bqjr.job.icbc.ICBCDetailQueryTask" />
+	
+	<bean id="xunLianTestDemoSendJob"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject">
+			<ref bean="xunLianTestDemo" />
+		 </property>
+		<property name="targetMethod">
+			<value>testCurrentSingleCharge</value>
+		</property>
+		<property name="concurrent">   
+            <value>false</value>   
+        </property> 
+	</bean>
+	<bean id="xunLianTestDemoJob" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail">
+			<ref bean="xunLianTestDemoSendJob"/>
+		</property>
+		<property name="cronExpression">
+			<value>${xunLianTestDemo}</value>
+		</property>
+	</bean>
+	
+	<bean id="umsTestDemoSendJob"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject">
+			<ref bean="umsTestDemo" />
+		 </property>
+		<property name="targetMethod">
+			<value>singleTranx</value>
+		</property>
+		<property name="concurrent">   
+            <value>false</value>   
+        </property> 
+	</bean>
+	<bean id="umsTestDemoJob" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail">
+			<ref bean="umsTestDemoSendJob"/>
+		</property>
+		<property name="cronExpression">
+			<value>${umsTestDemo}</value>
+		</property>
+	</bean>
+	<!-- job的配置开始 -->	
+	<!-- ====================工行直扣==对账明细查询job配置 start ================================ -->
+	<bean id="icbcDetailQueryTaskSendJob"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject">
+			<ref bean="icbcDetailQueryTask" />
+		 </property>
+		<property name="targetMethod">
+			<value>todayDetailQuery</value>
+		</property>
+		<property name="concurrent">   
+            <value>false</value>   
+        </property> 
+	</bean>
+	<!-- ====================工行直扣==对账明细查询job配置 end ================================ -->
+	<!-- ====================工行直扣==对账明细mq推送job配置 start ================================ -->
+	<bean id="icbcDetailMQSendTaskSendJob"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject">
+			<ref bean="icbcDetailQueryTask" />
+		 </property>
+		<property name="targetMethod">
+			<value>doMQsendDetailInfo</value>
+		</property>
+		<property name="concurrent">   
+            <value>false</value>   
+        </property> 
+	</bean>
+	<!-- ====================工行直扣==对账明细mq推送job配置job配置 end ================================ -->
+	<!-- ====================工行直扣==批量签约导入job配置 start ================================ -->
+	<bean id="icbcDkBatchSignTaskSendJob"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject">
+			<ref bean="icbcDkBatchSignTask" />
+		 </property>
+		<property name="targetMethod">
+			<value>icbcDkBatchSignImport</value>
+		</property>
+		<property name="concurrent">   
+            <value>false</value>   
+        </property> 
+	</bean>
+	<!-- ====================工行直扣==批量签约导入job配置 end ================================ -->
+	<!-- ====================工行直扣==批量签约导入查询job配置 start ================================ -->
+	<bean id="icbcDkBatchSignQueryTaskSendJob"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject">
+			<ref bean="icbcDkBatchSignTask" />
+		 </property>
+		<property name="targetMethod">
+			<value>icbcDkBatchSignQuery</value>
+		</property>
+		<property name="concurrent">   
+            <value>false</value>   
+        </property> 
+	</bean>
+	<!-- ====================工行直扣==批量签约导入查询job配置 end ================================ -->
+	<!-- ====================工行直扣==直扣异常处理任务 start ================================ -->
+	<bean id="icbcBatchChargeExceptionSendJob"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject">
+			<ref bean="icbcBatchChargeExceptionTask" />
+		 </property>
+		<property name="targetMethod">
+			<value>doBatchChargeSendException</value>
+		</property>
+		<property name="concurrent">   
+            <value>false</value>   
+        </property> 
+	</bean>
+	<!-- ====================工行直扣==直扣异常处理任务  end ================================ -->
+	<bean id="synSystemConfigTaskSendDoJob"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject">
+			<ref bean="synSystemConfigTask" />
+		 </property>
+		<property name="targetMethod">
+			<value>syn</value>
+		</property>
+		<property name="concurrent">   
+            <value>false</value>   
+        </property> 
+	</bean>
+	<bean id="EBUFChargeTaskSendDoJob"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject">
+			<ref bean="EBUFChargeTask" />
+		 </property>
+		<property name="targetMethod">
+			<value>doSendEBUFBatchCharge</value>
+		</property>
+		<property name="concurrent">   
+            <value>false</value>   
+        </property> 
+	</bean>
+	<bean id="EBUFChargeQueryDoJob"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject">
+			<ref bean="EBUFChargeTask" />
+		 </property>
+		<property name="targetMethod">
+			<value>doQueryEBUFBatchCharge</value>
+		</property>
+		<property name="concurrent">   
+            <value>false</value>   
+        </property> 
+	</bean>
+	<!-- <bean id="EBUFChargeFtpExSendDoJob"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject">
+			<ref bean="EBUFChargeTask" />
+		 </property>
+		<property name="targetMethod">
+			<value>doSendChargeFtpException</value>
+		</property>
+		<property name="concurrent">   
+            <value>false</value>   
+        </property> 
+	</bean> -->
+	<bean id="kftBatchChargeSendDoJob"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject">
+			<ref bean="kftBatchChargeTask" />
+		 </property>
+		<property name="targetMethod">
+			<value>doSendKFTBatchCharge</value>
+		</property>
+		<property name="concurrent">   
+            <value>false</value>   
+        </property> 
+	</bean>
+	<bean id="kftBatchChargeQueryDoJob"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject">
+			<ref bean="kftBatchChargeTask" />
+		 </property>
+		<property name="targetMethod">
+			<value>doQueryKFTBatchCharge</value>
+		</property>
+		<property name="concurrent">   
+            <value>false</value>   
+        </property> 
+	</bean>
+	<bean id="icbcBatchChargeSendDoJob"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject">
+			<ref bean="icbcBatchChargeTask" />
+		 </property>
+		<property name="targetMethod">
+			<value>doSendICBCBatchCharge</value>
+		</property>
+		<property name="concurrent">   
+            <value>false</value>   
+        </property> 
+	</bean>
+	<bean id="icbcBatchChargeMQSendDoJob"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject">
+			<ref bean="icbcBatchChargeTask" />
+		 </property>
+		<property name="targetMethod">
+			<value>doMQSendICBCBatchCharge</value>
+		</property>
+		<property name="concurrent">   
+            <value>false</value>   
+        </property> 
+	</bean>
+	<bean id="icbcBatchChargeQueryDoJob"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject">
+			<ref bean="icbcBatchChargeTask" />
+		 </property>
+		<property name="targetMethod">
+			<value>doQueryICBCBatchCharge</value>
+		</property>
+		<property name="concurrent">   
+            <value>false</value>   
+        </property> 
+	</bean>
+	<bean id="taskAllocationDoJob"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject">
+			<ref bean="taskAllocation" />
+		 </property>
+		<property name="targetMethod">
+			<value>doExectue</value>
+		</property>
+		<property name="concurrent">   
+            <value>false</value>   
+        </property> 
+	</bean>
+	<bean id="subTaskDoJobSend"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject">
+			<ref bean="subTask" />
+		</property>
+		<property name="targetMethod">
+			<value>doSendExectue</value>
+		</property>
+		<property name="concurrent">   
+            <value>false</value>   
+        </property> 
+	</bean>
+	<bean id="subTaskDoJobQuery"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject">
+			<ref bean="subTask" />
+		</property>
+		<property name="targetMethod">
+			<value>doQueryExectue</value>
+		</property>
+		<property name="concurrent">   
+            <value>false</value>   
+        </property> 
+	</bean>
+	<bean id="subTaskDoJobASend"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject">
+			<ref bean="subTaskA" />
+		</property>
+		<property name="targetMethod">
+			<value>doSendExectue</value>
+		</property>
+		<property name="concurrent">   
+            <value>false</value>   
+        </property> 
+	</bean>
+	<bean id="subTaskDoJobAQuery"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject">
+			<ref bean="subTaskA" />
+		</property>
+		<property name="targetMethod">
+			<value>doQueryExectue</value>
+		</property>
+		<property name="concurrent">   
+            <value>false</value>   
+        </property> 
+	</bean>
+	<bean id="subTaskDoJobBSend"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject">
+			<ref bean="subTaskB" />
+		</property>
+		<property name="targetMethod">
+			<value>doSendExectue</value>
+		</property>
+		<property name="concurrent">   
+            <value>false</value>   
+        </property> 
+	</bean>
+	<bean id="subTaskDoJobBQuery"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject">
+			<ref bean="subTaskB" />
+		</property>
+		<property name="targetMethod">
+			<value>doQueryExectue</value>
+		</property>
+		<property name="concurrent">   
+            <value>false</value>   
+        </property> 
+	</bean>
+	<bean id="subTaskDoJobCSend"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject">
+			<ref bean="subTaskC" />
+		</property>
+		<property name="targetMethod">
+			<value>doSendExectue</value>
+		</property>
+		<property name="concurrent">   
+            <value>false</value>   
+        </property> 
+	</bean>
+	<bean id="subTaskDoJobCQuery"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject">
+			<ref bean="subTaskC" />
+		</property>
+		<property name="targetMethod">
+			<value>doQueryExectue</value>
+		</property>
+		<property name="concurrent">   
+            <value>false</value>   
+        </property> 
+	</bean>
+	<bean id="subTaskDoJobDSend"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject">
+			<ref bean="subTaskD" />
+		</property>
+		<property name="targetMethod">
+			<value>doSendExectue</value>
+		</property>
+		<property name="concurrent">   
+            <value>false</value>   
+        </property> 
+	</bean>
+	<bean id="subTaskDoJobDQuery"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject">
+			<ref bean="subTaskD" />
+		</property>
+		<property name="targetMethod">
+			<value>doQueryExectue</value>
+		</property>
+		<property name="concurrent">   
+            <value>false</value>   
+        </property> 
+	</bean>
+	<bean id="vindicateJobTaskDoJob"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject">
+			<ref bean="vindicateJobTask" />
+		</property>
+		<property name="targetMethod">
+			<value>doExectue</value>
+		</property>
+		<property name="concurrent">   
+            <value>false</value>   
+        </property> 
+	</bean>
+	<bean id="withholdHistoryJobDetail"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject">
+			<ref bean="withholdHistoryJob" />
+		</property>
+		<property name="targetMethod">
+			<value>doExectue</value>
+		</property>
+		<property name="concurrent">   
+            <value>false</value>   
+        </property> 
+	</bean>
+	<bean id="contractkftTaskDoJob"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject">
+			<ref bean="contractkftTask" /> 
+		</property>
+		<property name="targetMethod">
+			<value>doExectue</value>
+		</property>
+		<property name="concurrent">   
+            <value>false</value>   
+        </property> 
+	</bean>
+	<bean id="changekftTaskDoJob"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject">
+			<ref bean="changekftTask" />
+		</property>
+		<property name="targetMethod">
+			<value>doExectue</value>
+		</property>
+		<property name="concurrent">   
+            <value>false</value>   
+        </property> 
+	</bean>
+	<bean id="acpHhSendTaskDoJob"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject">
+			<ref bean="acpHhSendTask" />
+		</property>
+		<property name="targetMethod">
+			<value>doExectue</value>
+		</property>
+		<property name="concurrent">   
+            <value>false</value>   
+        </property> 
+	</bean>
+	<bean id="acpHhSendTask2DoJob"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject">
+			<ref bean="acpHhSendTask2" />
+		</property>
+		<property name="targetMethod">
+			<value>doExectue</value>
+		</property>
+		<property name="concurrent">   
+            <value>false</value>   
+        </property> 
+	</bean>
+	<bean id="acpHhSendTask3DoJob"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject">
+			<ref bean="acpHhSendTask3" />
+		</property>
+		<property name="targetMethod">
+			<value>doExectue</value>
+		</property>
+		<property name="concurrent">   
+            <value>false</value>   
+        </property> 
+	</bean>
+	<bean id="acpHhReceiveTaskDoJob"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject">
+			<ref bean="acpHhReceiveTask" />
+		</property>
+		<property name="targetMethod">
+			<value>doExectue</value>
+		</property>
+		<property name="concurrent">   
+            <value>false</value>   
+        </property> 
+	</bean>
+	<bean id="acpTfbTaskDoJob"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject">
+			<ref bean="acpTfbTask" />
+		</property>
+		<property name="targetMethod">
+			<value>doExectue</value>
+		</property>
+		<property name="concurrent">   
+            <value>false</value>   
+        </property> 
+	</bean>
+	<bean id="acpTfbQueryTaskDoJob"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject">
+			<ref bean="acpTfbQueryTask" />
+		</property>
+		<property name="targetMethod">
+			<value>doExectue</value>
+		</property>
+		<property name="concurrent">   
+            <value>false</value>   
+        </property> 
+	</bean>
+	<bean id="acpTfbExceptionTaskDoJob"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject">
+			<ref bean="acpTfbExceptionTask" />
+		</property>
+		<property name="targetMethod">
+			<value>doExectue</value>
+		</property>
+		<property name="concurrent">   
+            <value>false</value>   
+        </property> 
+	</bean>
+	<!-- job的配置结束 -->
+	
+	<!-- 启动触发器的配置开始 -->
+	<bean name="startQuertz" lazy-init="false" autowire="no"
+		class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+		<property name="triggers">
+			<list>
+			    <!--<ref bean="taskAllocationJob"/>
+			    <ref bean="subTaskJobSend"/>
+			  	<ref bean="subTaskJobASend"/>
+			 	<ref bean="subTaskJobBSend"/>
+				<ref bean="subTaskJobCSend"/> 
+				<ref bean="subTaskJobDSend"/>
+				<ref bean="subTaskJobQuery"/>
+			  	<ref bean="subTaskJobAQuery"/>
+			 	<ref bean="subTaskJobBQuery"/>
+				<ref bean="subTaskJobCQuery"/> 
+				<ref bean="subTaskJobDQuery"/>
+			 	<ref bean="withholdHistoryJobTrigger"/> 
+			 	 <ref bean="acpHhSendTaskJob"/>
+				<ref bean="acpHhSendTask2Job"/>
+			 	<ref bean="acpHhSendTask3Job"/>
+			 	<ref bean="acpHhReceiveTaskJob"/> 
+				<ref bean="contractkftTaskJob"/> 
+			 	<ref bean="changekftTaskob"/>
+			 	<ref bean="vindicateJobTaskJob"/>
+			 	<ref bean="kftBatchChargeSendJob"/>
+			 	<ref bean="kftBatchChargeQueryJob"/>
+			 	<ref bean="acpTfbTaskJob"/> 
+			 	<ref bean="acpTfbQueryTaskJob"/>
+			 	<ref bean="acpTfbExceptionTaskJob"/>
+			 	<ref bean="EBUFChargeFtpExSendJob"/> 
+			 	<ref bean="EBUFChargeQueryJob"/> 
+			 	<ref bean="EBUFChargeSendJob"/>
+			 	<ref bean="synSystemConfigJob"/>-->
+			 	<ref bean="icbcBatchChargeSendJob"/>
+			 	<ref bean="icbcBatchChargeMQSendJob"/>
+			 	<ref bean="icbcBatchChargeQueryJob"/>
+			 	<ref bean="icbcDetailQueryJob"/>
+			 	<ref bean="icbcDkBatchSignJob"/>
+			 	<ref bean="icbcDkBatchSignQueryJob"/>
+			 	<ref bean="icbcDetailMQSendJob"/>
+			 	<ref bean="icbcBatchChargeExceptionJob"/>
+			 	<ref bean="umsTestDemoJob"/>
+			 	<ref bean="xunLianTestDemoJob"/>
+			</list>
+		</property>
+	</bean>
+	<!-- 调度的配置结束 -->
+	
+	<!-- 调度的配置开始 --> 
+	<!-- ====================工行直扣==对账明细查询job配置 start ================================ -->
+	<bean id="icbcDetailQueryJob" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail">
+			<ref bean="icbcDetailQueryTaskSendJob"/>
+		</property>
+		<property name="cronExpression">
+			<value>${icbcTodayQuery}</value>
+		</property>
+	</bean>
+	<!-- ====================工行直扣==对账明细查询job配置 end ================================ -->
+	<!-- ====================工行直扣==对账明细mq推送job配置 start ================================ -->
+	<bean id="icbcDetailMQSendJob" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail">
+			<ref bean="icbcDetailMQSendTaskSendJob"/>
+		</property>
+		<property name="cronExpression">
+			<value>${doMQsendDetailInfo}</value>
+		</property>
+	</bean>
+	<!-- ====================工行直扣==对账明细mq推送job配置job配置 end ================================ -->
+	<!-- ====================工行直扣==批量签约导入job配置 start ================================ -->
+	<bean id="icbcDkBatchSignJob" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail">
+			<ref bean="icbcDkBatchSignTaskSendJob"/>
+		</property>
+		<property name="cronExpression">
+			<value>${icbcBatchSignImport}</value>
+		</property>
+	</bean>
+	<!-- ====================工行直扣==批量签约导入job配置 end ================================ -->
+	<!-- ====================工行直扣==批量签约导入查询job配置 start ================================ -->
+	<bean id="icbcDkBatchSignQueryJob" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail">
+			<ref bean="icbcDkBatchSignQueryTaskSendJob"/>
+		</property>
+		<property name="cronExpression">
+			<value>${icbcBatchSignQuery}</value>
+		</property>
+	</bean>
+	<!-- ====================工行直扣==批量签约导入查询job配置 end ================================ -->
+	<!-- ====================工行直扣==直扣异常处理任务 start ================================ -->
+	<bean id="icbcBatchChargeExceptionJob" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail">
+			<ref bean="icbcBatchChargeExceptionSendJob"/>
+		</property>
+		<property name="cronExpression">
+			<value>${icbcChargeException}</value>
+		</property>
+	</bean>
+	<!-- ====================工行直扣==直扣异常处理任务  end ================================ -->	
+	<bean id="synSystemConfigJob" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail">
+			<ref bean="synSystemConfigTaskSendDoJob"/>
+		</property>
+		<property name="cronExpression">
+			<value>${synSystemConfig}</value>
+		</property>
+	</bean>
+	<bean id="EBUFChargeSendJob" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail">
+			<ref bean="EBUFChargeTaskSendDoJob"/>
+		</property>
+		<property name="cronExpression">
+			<value>${EBUFChargeTaskSend}</value>
+		</property>
+	</bean>
+	<bean id="EBUFChargeQueryJob" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail">
+			<ref bean="EBUFChargeQueryDoJob"/>
+		</property>
+		<property name="cronExpression">
+			<value>${EBUFChargeTaskQuery}</value>
+		</property>
+	</bean>
+	<!-- <bean id="EBUFChargeFtpExSendJob" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail">
+			<ref bean="EBUFChargeFtpExSendDoJob"/>
+		</property>
+		<property name="cronExpression">
+			<value>${EBUFChargeFtpExSend}</value>
+		</property>
+	</bean> -->
+	<bean id="kftBatchChargeSendJob" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail">
+			<ref bean="kftBatchChargeSendDoJob"/>
+		</property>
+		<property name="cronExpression">
+			<value>${kftBatchChargeSend}</value>
+		</property>
+	</bean>
+	<bean id="kftBatchChargeQueryJob" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail">
+			<ref bean="kftBatchChargeQueryDoJob"/>
+		</property>
+		<property name="cronExpression">
+			<value>${kftBatchChargeQuery}</value>
+		</property>
+	</bean>
+	<bean id="icbcBatchChargeSendJob" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail">
+			<ref bean="icbcBatchChargeSendDoJob"/>
+		</property>
+		<property name="cronExpression">
+			<value>${icbcBatchChargeSend}</value>
+		</property>
+	</bean>
+	<bean id="icbcBatchChargeMQSendJob" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail">
+			<ref bean="icbcBatchChargeMQSendDoJob"/>
+		</property>
+		<property name="cronExpression">
+			<value>${icbcBatchChargeMQSend}</value>
+		</property>
+	</bean>
+	<bean id="icbcBatchChargeQueryJob" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail">
+			<ref bean="icbcBatchChargeQueryDoJob"/>
+		</property>
+		<property name="cronExpression">
+			<value>${icbcBatchChargeQuery}</value>
+		</property>
+	</bean>
+	<bean id="contractkftTaskJob" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail">
+			<ref bean="contractkftTaskDoJob"/>
+		</property>
+		<property name="cronExpression">
+			<value>${contractkftTaskJob}</value>
+		</property>
+	</bean>
+	<bean id="changekftTaskob" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail">
+			<ref bean="changekftTaskDoJob"/>
+		</property>
+		<property name="cronExpression">
+			<value>${changekftTaskob}</value>
+		</property>
+	</bean>
+	<bean id="subTaskJobSend" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail">
+			<ref bean="subTaskDoJobSend"/>
+		</property>
+		<property name="cronExpression">
+			<value>${subTaskJobTime}</value>
+		</property>
+	</bean>
+	<bean id="subTaskJobQuery" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail">
+			<ref bean="subTaskDoJobQuery"/>
+		</property>
+		<property name="cronExpression">
+			<value>${subTaskJobTime}</value>
+		</property>
+	</bean>
+	<bean id="subTaskJobASend" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail">
+			<ref bean="subTaskDoJobASend"/>
+		</property>
+		<property name="cronExpression">
+			<value>${subTaskJobTimeA}</value>
+		</property>
+	</bean>
+	<bean id="subTaskJobAQuery" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail">
+			<ref bean="subTaskDoJobAQuery"/>
+		</property>
+		<property name="cronExpression">
+			<value>${subTaskJobTimeA}</value>
+		</property>
+	</bean>
+	<bean id="subTaskJobBSend" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail">
+			<ref bean="subTaskDoJobBSend"/>
+		</property>
+		<property name="cronExpression">
+			<value>${subTaskJobTimeB}</value>
+		</property>
+	</bean>
+	<bean id="subTaskJobBQuery" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail">
+			<ref bean="subTaskDoJobBQuery"/>
+		</property>
+		<property name="cronExpression">
+			<value>${subTaskJobTimeB}</value>
+		</property>
+	</bean>
+	<bean id="subTaskJobCSend" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail">
+			<ref bean="subTaskDoJobCSend"/>
+		</property>
+		<property name="cronExpression">
+			<value>${subTaskJobTimeC}</value>
+		</property>
+	</bean>
+	<bean id="subTaskJobCQuery" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail">
+			<ref bean="subTaskDoJobCQuery"/>
+		</property>
+		<property name="cronExpression">
+			<value>${subTaskJobTimeC}</value>
+		</property>
+	</bean>
+	<bean id="subTaskJobDSend" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail">
+			<ref bean="subTaskDoJobDSend"/>
+		</property>
+		<property name="cronExpression">
+			<value>${subTaskJobTimeD}</value>
+		</property>
+	</bean>
+	<bean id="subTaskJobDQuery" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail">
+			<ref bean="subTaskDoJobDQuery"/>
+		</property>
+		<property name="cronExpression">
+			<value>${subTaskJobTimeD}</value>
+		</property>
+	</bean>
+	<bean id="withholdHistoryJobTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail">
+			<ref bean="withholdHistoryJobDetail" />
+		</property>
+		<property name="cronExpression">
+			<value>${withholdHistoryJob}</value>
+		</property>
+	</bean>
+	<bean id="taskAllocationJob" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail">
+			<ref bean="taskAllocationDoJob"/>
+		</property>
+		<property name="cronExpression">
+			<value>${taskAllocationTime}</value>
+		</property>
+	</bean>
+	<bean id="vindicateJobTaskJob" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail">
+			<ref bean="vindicateJobTaskDoJob"/>
+		</property>
+		<property name="cronExpression">
+			<value>${vindicateJobTaskJob}</value>
+		</property>
+	</bean>
+	<bean id="acpHhSendTaskJob" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail">
+			<ref bean="acpHhSendTaskDoJob"/>
+		</property>
+		<property name="cronExpression">
+			<value>${acpHhSendTaskJob}</value>
+		</property>
+	</bean>
+	<bean id="acpHhSendTask2Job" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail">
+			<ref bean="acpHhSendTask2DoJob"/>
+		</property>
+		<property name="cronExpression">
+			<value>${acpHhSendTask2Job}</value>
+		</property>
+	</bean>
+	<bean id="acpHhSendTask3Job" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail">
+			<ref bean="acpHhSendTask3DoJob"/>
+		</property>
+		<property name="cronExpression">
+			<value>${acpHhSendTask3Job}</value>
+		</property>
+	</bean>
+	<bean id="acpHhReceiveTaskJob" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail">
+			<ref bean="acpHhReceiveTaskDoJob"/>
+		</property>
+		<property name="cronExpression">
+			<value>${acpHhReceiveTaskJob}</value>
+		</property>
+	</bean>
+	<bean id="acpTfbTaskJob" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail">
+			<ref bean="acpTfbTaskDoJob"/>
+		</property>
+		<property name="cronExpression">
+			<value>${acpTfbTaskJob}</value>
+		</property>
+	</bean>
+	<bean id="acpTfbQueryTaskJob" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail">
+			<ref bean="acpTfbQueryTaskDoJob"/>
+		</property>
+		<property name="cronExpression">
+			<value>${acpTfbQueryTaskJob}</value>
+		</property>
+	</bean>
+	<bean id="acpTfbExceptionTaskJob" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail">
+			<ref bean="acpTfbExceptionTaskDoJob"/>
+		</property>
+		<property name="cronExpression">
+			<value>${acpTfbExceptionTaskJob}</value>
+		</property>
+	</bean>
+	<!-- 启动触发器的配置结束 -->
+	
+</beans>
