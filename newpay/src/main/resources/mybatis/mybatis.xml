@@ -1,24 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-    xmlns:mvc="http://www.springframework.org/schema/mvc" 
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:p="http://www.springframework.org/schema/p"
-     xmlns:context="http://www.springframework.org/schema/context"
-    xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:p="http://www.springframework.org/schema/p" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
         http://www.springframework.org/schema/beans/spring-beans.xsd
         http://www.springframework.org/schema/context 
         http://www.springframework.org/schema/context/spring-context.xsd
         http://www.springframework.org/schema/mvc
         http://www.springframework.org/schema/mvc/spring-mvc.xsd">
 
-        <!-- 配置扫描controller包 -->
-        <context:component-scan base-package="com.bqjr" />
-        <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
-        	<property name="dataSource" ref="dataSource"></property>
-        	<property name="mapperLocations" value="classpath:mapper/*.xml"></property>
-        </bean>
-        
-        <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
-        	<property name="basePackage" value="com.bqjr.dao"></property>
-        </bean>
+	<!-- 配置扫描controller包 -->
+	<context:component-scan base-package="com.bqjr" />
+	<bean id="pageHelperPlugin" class="com.github.pagehelper.PageInterceptor"></bean>
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource"></property>
+		<property name="mapperLocations" value="classpath:mapper/*.xml"></property>
+		<!-- <property name="plugins">
+			<array>
+				<bean class="com.github.pagehelper.PageInterceptor">
+					<property name="properties">
+						使用下面的方式配置参数，一行配置一个
+						<value>
+							helperDialect=oracle
+							offsetAsPageNum=true
+							rowBoundsWithCount=true
+							pageSizeZero=true
+							reasonable=true
+						</value>
+					</property>
+				</bean>
+			</array>
+		</property> -->
+	</bean>
+
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="basePackage" value="com.bqjr.dao"></property>
+	</bean>
 </beans>

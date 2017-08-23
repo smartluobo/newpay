@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bqjr.dao.EntityNameMapper">
+  <resultMap id="BaseResultMap" type="com.bqjr.model.EntityName">
+    <id column="SERIALNO" jdbcType="VARCHAR" property="SERIALNO" />
+    <result column="USERNAME" jdbcType="VARCHAR" property="USERNAME" />
+    <result column="USERCODE" jdbcType="VARCHAR" property="USERCODE" />
+    <result column="MQTYPE" jdbcType="DECIMAL" property="MQTYPE" />
+    <result column="MQKEY" jdbcType="VARCHAR" property="MQKEY" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    SERIALNO, USERNAME, USERCODE, MQTYPE, MQKEY
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from DK_USER_MQ
+    <if test="SERIALNO != null">
+    where SERIALNO = #{SERIALNO,jdbcType=VARCHAR}
+    </if>
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from DK_USER_MQ
+    where SERIALNO = #{SERIALNO,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.bqjr.model.EntityName">
+    insert into DK_USER_MQ (SERIALNO, USERNAME, USERCODE, 
+      MQTYPE, MQKEY)
+    values (#{SERIALNO,jdbcType=VARCHAR}, #{USERNAME,jdbcType=VARCHAR}, #{USERCODE,jdbcType=VARCHAR}, 
+      #{MQTYPE,jdbcType=DECIMAL}, #{MQKEY,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.bqjr.model.EntityName">
+    insert into DK_USER_MQ
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="SERIALNO != null">
+        SERIALNO,
+      </if>
+      <if test="USERNAME != null">
+        USERNAME,
+      </if>
+      <if test="USERCODE != null">
+        USERCODE,
+      </if>
+      <if test="MQTYPE != null">
+        MQTYPE,
+      </if>
+      <if test="MQKEY != null">
+        MQKEY,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="SERIALNO != null">
+        #{SERIALNO,jdbcType=VARCHAR},
+      </if>
+      <if test="USERNAME != null">
+        #{USERNAME,jdbcType=VARCHAR},
+      </if>
+      <if test="USERCODE != null">
+        #{USERCODE,jdbcType=VARCHAR},
+      </if>
+      <if test="MQTYPE != null">
+        #{MQTYPE,jdbcType=DECIMAL},
+      </if>
+      <if test="MQKEY != null">
+        #{MQKEY,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.bqjr.model.EntityName">
+    update DK_USER_MQ
+    <set>
+      <if test="USERNAME != null">
+        USERNAME = #{USERNAME,jdbcType=VARCHAR},
+      </if>
+      <if test="USERCODE != null">
+        USERCODE = #{USERCODE,jdbcType=VARCHAR},
+      </if>
+      <if test="MQTYPE != null">
+        MQTYPE = #{MQTYPE,jdbcType=DECIMAL},
+      </if>
+      <if test="MQKEY != null">
+        MQKEY = #{MQKEY,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where SERIALNO = #{SERIALNO,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.bqjr.model.EntityName">
+    update DK_USER_MQ
+    set USERNAME = #{USERNAME,jdbcType=VARCHAR},
+      USERCODE = #{USERCODE,jdbcType=VARCHAR},
+      MQTYPE = #{MQTYPE,jdbcType=DECIMAL},
+      MQKEY = #{MQKEY,jdbcType=VARCHAR}
+    where SERIALNO = #{SERIALNO,jdbcType=VARCHAR}
+  </update>
+</mapper>

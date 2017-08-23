@@ -1,0 +1,7 @@
+1.oralce驱动加入到maven库 先下载ojdbc6，如果本地安装了oracle ojdbc6可以在oracle安装目录找到
+2.ojdbc6安装到maven库在maven命令行模式下使用命令：我的是11.2.0.4.0
+mvn install:install-file -DgroupId=com.oracle -DartifactId=ojdbc6 -Dversion=11.2.0.4.0 -Dpackaging=jar -Dfile=C:/app/lib/ojdbc6.jar
+3.查看本机安装的oracle版本，在plsql中使用竖起来语句select * from v$version;查看本机安装的oracle安装版本
+4.修改src/main/resources/mybatis_generator/generatorConfig.xml下的逆向工程配置文件
+5.在项目或者pom文件上单击右键Run as->maven bulid->mybatis-generator:generate，刷新项目查看逆向工程生成的文件
+
