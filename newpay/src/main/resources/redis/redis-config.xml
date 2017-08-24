@@ -1,0 +1,76 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans   
+        http://www.springframework.org/schema/beans/spring-beans-4.3.xsd   
+        http://www.springframework.org/schema/mvc   
+        http://www.springframework.org/schema/mvc/spring-mvc-4.3.xsd   
+        http://www.springframework.org/schema/context   
+        http://www.springframework.org/schema/context/spring-context-4.3.xsd   
+        http://www.springframework.org/schema/aop   
+        http://www.springframework.org/schema/aop/spring-aop-4.3.xsd   
+        http://www.springframework.org/schema/tx   
+        http://www.springframework.org/schema/tx/spring-tx-4.3.xsd ">
+	<!-- <context:property-placeholder
+		ignore-unresolvable="true" location="classpath:redis.properties" /> -->
+	<bean id="poolConfig" class="redis.clients.jedis.JedisPoolConfig">
+		<property name="maxTotal" value="${redis.maxTotal}" />
+		<property name="minIdle" value="${redis.minIdle}" />
+		<property name="maxWaitMillis" value="${redis.maxWaitTime}" />
+		<property name="maxIdle" value="${redis.maxIdle}" />
+		<property name="testOnBorrow" value="${redis.testOnBorrow}" />
+		<property name="testOnReturn" value="true" />
+		<property name="testWhileIdle" value="true" />
+	</bean>
+	<bean id="jedisSentinelPool" class="redis.clients.jedis.JedisSentinelPool">
+		<constructor-arg index="0" value="mymaster" />
+		<constructor-arg index="1">
+			<set>
+				<value>${redis.sentinel1.host}:${redis.sentinel1.port}</value>
+				<value>${redis.sentinel2.host}:${redis.sentinel2.port}</value>
+				<value>${redis.sentinel3.host}:${redis.sentinel3.port}</value>
+			</set>
+		</constructor-arg>
+		<constructor-arg index="2" ref="poolConfig" />
+		<!-- <constructor-arg index="3" value="${redis.password}" /> -->
+		<bean id="jeidsConnectionFactory"
+			class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory"
+			p:password="${im.hs.server.redis.sentinel.password}">
+			<constructor-arg name="sentinelConfig" ref="redisSentinelConfiguration"></constructor-arg>
+			<constructor-arg name="poolConfig" ref="poolConfig"></constructor-arg>
+		</bean>
+
+
+		<bean id="redisTemplate" class="org.springframework.data.redis.core.RedisTemplate">
+			<property name="connectionFactory" ref="jeidsConnectionFactory" />
+			<property name="keySerializer">
+				<bean
+					class="org.springframework.data.redis.serializer.StringRedisSerializer" />
+			</property>
+			<property name="valueSerializer">
+				<bean
+					class="org.springframework.data.redis.serializer.JdkSerializationRedisSerializer" />
+			</property>
+			<property name="hashKeySerializer">
+				<bean
+					class="org.springframework.data.redis.serializer.StringRedisSerializer" />
+			</property>
+			<property name="hashValueSerializer">
+				<bean
+					class="org.springframework.data.redis.serializer.JdkSerializationRedisSerializer" />
+			</property>
+			<property name="defaultSerializer">
+				<bean
+					class="org.springframework.data.redis.serializer.StringRedisSerializer" />
+			</property>
+		</bean>
+
+		<!-- 封装redis缓存操作类 实现自接口：ICacheMangerTarget 
+		<bean id="cacheMangerTarget"
+			class="com.xx.xx.db.cache.redis.CacheMangerJedisSentinerAdapter">
+			<constructor-arg index="0" ref="jedisPool" />
+		</bean>-->
+	</bean>
+
+</beans>    
