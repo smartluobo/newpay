@@ -16,12 +16,8 @@
 		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
 		<property name="locations">
 			<list>
-			   <!--  <value>/WEB-INF/redis/redis.properties</value>
-				<value>/WEB-INF/jdbc.properties</value>
-				<value>/WEB-INF/quertz.properties</value>
-				<value>/WEB-INF/mq/mq.properties</value> 
-				<value>classpath*:*.properties</value>-->
 				<value>classpath:jdbc/jdbc.properties</value>
+				<value>classpath:redis/redis.properties</value>
 			</list>
 		</property>
 	</bean>
@@ -46,4 +42,5 @@
 	</bean>
 	<import resource="classpath:dataSource/dataSource.xml"/>
 	<import resource="classpath:mybatis/mybatis.xml"/>
+	<import resource="classpath:redis/redis.xml"/>
 </beans>
