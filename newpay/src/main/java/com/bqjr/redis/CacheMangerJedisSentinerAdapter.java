@@ -19,13 +19,13 @@ import redis.clients.jedis.exceptions.JedisException;
  * @version
  * @since JDK 1.8
  */
-public class CacheMangerJedisSentinerAdapter /*implements ICacheMangerTarget*/ {
+public class CacheMangerJedisSentinerAdapter implements ICacheMangerTarget {
 
-//    protected JedisSentinelPool jedisPool;
-//
-//    // protostuff序列化
-//    //protected RuntimeSchema<Object> schema = RuntimeSchema.createFrom(Object.class);
-//
+    protected JedisSentinelPool jedisPool;
+
+//     protostuff序列化
+//    protected RuntimeSchema<Object> schema = RuntimeSchema.createFrom(Object.class);
+
 //    public CacheMangerJedisSentinerAdapter(JedisSentinelPool jedisPool) {
 //        this.jedisPool = jedisPool;
 //    }

@@ -1,4 +1,5 @@
 eclipse.preferences.version=1
+encoding//src/main/resources/redis/back/redis.properties=UTF-8
+encoding//src/main/resources/redis/back/redis2.properties=UTF-8
 encoding//src/main/resources/redis/redis.properties=UTF-8
-encoding//src/main/resources/redis/redis2.properties=UTF-8
 encoding//src/test/java=UTF-8

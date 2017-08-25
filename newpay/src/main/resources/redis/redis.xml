@@ -1,63 +1,70 @@
-<?xml version="1.0" encoding="UTF-8" ?>  
-<beans xmlns="http://www.springframework.org/schema/beans"  
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"  
-	xmlns:context="http://www.springframework.org/schema/context"  
-	xsi:schemaLocation="http://www.springframework.org/schema/beans  
-	http://www.springframework.org/schema/beans/spring-beans-3.0.xsd  
-	http://www.springframework.org/schema/context  
-	http://www.springframework.org/schema/context/spring-context-3.0.xsd">  
-	
-		<!-- <bean id="jedisPoolConfig" class="redis.clients.jedis.JedisPoolConfig">  
-			<property name="maxTotal" value="50" />  
-			<property name="maxIdle" value="4" />  
-			<property name="testOnBorrow" value="true" />  
-			<property name="testOnReturn" value="false" />  
-			<property name="testWhileIdle" value="#{redisConfiguration['TEST_WHILE_IDLE']}" />  
-		</bean>  
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:p="http://www.springframework.org/schema/p" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context 
+        http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/mvc
+        http://www.springframework.org/schema/mvc/spring-mvc.xsd">
 
-		<bean id="jedis.shardInfoCache1" class="redis.clients.jedis.JedisShardInfo">  
-			<constructor-arg index="0" value="127.0.0.1" />  
-			<constructor-arg index="1"  type="int" value="6379" />  
-		</bean>   
-		<bean id="jedis.shardInfoCache2" class="redis.clients.jedis.JedisShardInfo">  
-			<constructor-arg index="0" value="127.0.0.1" />  
-			<constructor-arg index="1"  type="int" value="6380" />  
-		</bean>
-		<bean id="jedis.shardInfoCache3" class="redis.clients.jedis.JedisShardInfo">  
-			<constructor-arg index="0" value="127.0.0.1" />  
-			<constructor-arg index="1"  type="int" value="6381" />  
-		</bean> 
-		
+	<bean id="poolConfig" class="redis.clients.jedis.JedisPoolConfig">
+		<property name="maxTotal" value="${redis.maxTotal}" />
+		<property name="minIdle" value="${redis.minIdle}" />
+		<property name="maxWaitMillis" value="${redis.maxWaitTime}" />
+		<property name="maxIdle" value="${redis.maxIdle}" />
+		<property name="testOnBorrow" value="${redis.testOnBorrow}" />
+		<property name="testOnReturn" value="true" />
+		<property name="testWhileIdle" value="true" />
+	</bean>
+	<!-- <bean id="jedisSentinelPool" class="redis.clients.jedis.JedisSentinelPool">
+		<constructor-arg index="0" value="mymaster" />
+		<constructor-arg index="1">
+			<set>
+				<value>${redis.sentinel1.host}:${redis.sentinel1.port}</value>
+				<value>${redis.sentinel2.host}:${redis.sentinel2.port}</value>
+				<value>${redis.sentinel3.host}:${redis.sentinel3.port}</value>
+			</set>
+		</constructor-arg>
+		<constructor-arg index="2" ref="poolConfig" />
+	</bean> -->
+	<bean id="jeidsConnectionFactory" class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory" >
+		<!-- <constructor-arg name="sentinelConfig" ref="jedisSentinelPool"></constructor-arg> -->
+		<property name="hostName" value="127.0.0.1" />  
+        <property name="port" value="6381" />  
+        <property name="poolConfig" ref="poolConfig" /> 
+		<!-- <constructor-arg name="poolConfig" ref="poolConfig"></constructor-arg> -->
+	</bean>
 
-		<bean id="shardedJedisPoolCache" class="redis.clients.jedis.ShardedJedisPool">  
-			<constructor-arg index="0" ref="jedisPoolConfig" />  
-			<constructor-arg index="1">  
-				<list>  
-					<ref bean="jedis.shardInfoCache1" />  
-					<ref bean="jedis.shardInfoCache2" />
-					<ref bean="jedis.shardInfoCache3" /> 
-				</list>  
-			</constructor-arg>  
-		</bean>  
 
-		<bean id="redisCache" class="com.soshare.common.RedisUtil">  
-			<property name="shardedJedisPool" ref="shardedJedisPoolCache" />  
-		</bean>  --> 
-	<bean name="genericObjectPoolConfig" class="org.apache.commons.pool2.impl.GenericObjectPoolConfig" >  
-		<property name="maxWaitMillis" value="-1" />  
-		<property name="maxTotal" value="1000" />  
-		<property name="minIdle" value="8" />  
-		<property name="maxIdle" value="100" />  
-	</bean>  
-  
-	<bean id="jedisCluster" class="com.bqjr.redis.JedisClusterFactory">  
-		<property name="addressConfig">  
-			<value>classpath:redis/connect-redis.properties</value>  
-		</property>  
-		<property name="addressKeyPrefix" value="address" />   <!--  属性文件里  key的前缀 -->  
-      
-		<property name="timeout" value="300000" />  
-		<property name="maxRedirections" value="3" />  
-		<property name="genericObjectPoolConfig" ref="genericObjectPoolConfig" />  
-	</bean> 
-</beans>  
+	<bean id="redisTemplate" class="org.springframework.data.redis.core.RedisTemplate">
+		<property name="connectionFactory" ref="jeidsConnectionFactory" />
+		<property name="keySerializer">
+			<bean
+				class="org.springframework.data.redis.serializer.StringRedisSerializer" />
+		</property>
+		<property name="valueSerializer">
+			<bean
+				class="org.springframework.data.redis.serializer.JdkSerializationRedisSerializer" />
+		</property>
+		<property name="hashKeySerializer">
+			<bean
+				class="org.springframework.data.redis.serializer.StringRedisSerializer" />
+		</property>
+		<property name="hashValueSerializer">
+			<bean
+				class="org.springframework.data.redis.serializer.JdkSerializationRedisSerializer" />
+		</property>
+		<property name="defaultSerializer">
+			<bean
+				class="org.springframework.data.redis.serializer.StringRedisSerializer" />
+		</property>
+	</bean>
+
+		<!--  封装redis缓存操作类 实现自接口：ICacheMangerTarget 
+		<bean id="cacheMangerTarget"
+			class="com.xx.xx.db.cache.redis.CacheMangerJedisSentinerAdapter">
+			<constructor-arg index="0" ref="jedisPool" />
+		</bean> -->
+</beans>
