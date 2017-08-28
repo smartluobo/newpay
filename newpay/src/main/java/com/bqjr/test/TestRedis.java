@@ -22,7 +22,7 @@ public class TestRedis {
 	
 	
 	@Test
-	public void test() {
+	public void testFun1() {
 //		try {
 //		for(int i = 0 ; i < 100 ; i++) {
 //			jedisCluster.set("key" + i, "value" + i);
@@ -38,6 +38,23 @@ public class TestRedis {
 	            }
 	        });
 		
+	}
+	
+	@Test
+	public void testFun2(){
+		final String key = "key3";
+		final String value = "value3";
+		 redisTemplate.execute(new RedisCallback<Object>() {  
+	            @Override  
+	            public Object doInRedis(RedisConnection connection)  
+	                    throws DataAccessException {  
+	                connection.set(  
+	                        redisTemplate.getStringSerializer().serialize(key),  
+	                        redisTemplate.getStringSerializer().serialize(value));  
+	               System.out.println(("save key:" + key + ",value:" + value));  
+	                return null;  
+	            }  
+	        });  
 	}
 	
 

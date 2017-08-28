@@ -18,25 +18,48 @@
 		<property name="testOnReturn" value="true" />
 		<property name="testWhileIdle" value="true" />
 	</bean>
-	<!-- <bean id="jedisSentinelPool" class="redis.clients.jedis.JedisSentinelPool">
-		<constructor-arg index="0" value="mymaster" />
-		<constructor-arg index="1">
+	<bean id="sentinelConfiguration"
+		class="org.springframework.data.redis.connection.RedisSentinelConfiguration">
+		<property name="master">
+			<bean class="org.springframework.data.redis.connection.RedisNode">
+				<property name="name" value="mymaster"></property>
+			</bean>
+		</property>
+		<property name="sentinels">
 			<set>
-				<value>${redis.sentinel1.host}:${redis.sentinel1.port}</value>
-				<value>${redis.sentinel2.host}:${redis.sentinel2.port}</value>
-				<value>${redis.sentinel3.host}:${redis.sentinel3.port}</value>
+				<bean class="org.springframework.data.redis.connection.RedisNode">
+					<constructor-arg name="host" value="127.0.0.1"></constructor-arg>
+					<constructor-arg name="port" value="6379"></constructor-arg>
+				</bean>
+				<bean class="org.springframework.data.redis.connection.RedisNode">
+					<constructor-arg name="host" value="127.0.0.1"></constructor-arg>
+					<constructor-arg name="port" value="6380"></constructor-arg>
+				</bean>
+				<bean class="org.springframework.data.redis.connection.RedisNode">
+					<constructor-arg name="host" value="127.0.0.1"></constructor-arg>
+					<constructor-arg name="port" value="6381"></constructor-arg>
+				</bean>
 			</set>
-		</constructor-arg>
-		<constructor-arg index="2" ref="poolConfig" />
-	</bean> -->
-	<bean id="jeidsConnectionFactory" class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory" >
-		<!-- <constructor-arg name="sentinelConfig" ref="jedisSentinelPool"></constructor-arg> -->
-		<property name="hostName" value="127.0.0.1" />  
-        <property name="port" value="6381" />  
-        <property name="poolConfig" ref="poolConfig" /> 
-		<!-- <constructor-arg name="poolConfig" ref="poolConfig"></constructor-arg> -->
+		</property>
 	</bean>
 
+	<!-- <bean id="jedisSentinelPool" class="redis.clients.jedis.JedisSentinelPool"> 
+		<constructor-arg index="0" value="mymaster" /> <constructor-arg index="1"> 
+		<set> <value>${redis.sentinel1.host}:${redis.sentinel1.port}</value> <value>${redis.sentinel2.host}:${redis.sentinel2.port}</value> 
+		<value>${redis.sentinel3.host}:${redis.sentinel3.port}</value> </set> </constructor-arg> 
+		<constructor-arg index="2" ref="poolConfig" /> </bean> -->
+
+	<!--<bean id="jeidsConnectionFactory" class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory" 
+		> <constructor-arg name="sentinelConfig" ref="jedisSentinelPool"></constructor-arg> 
+		<property name="hostName" value="127.0.0.1" /> <property name="port" value="6381" 
+		/> <property name="poolConfig" ref="poolConfig" /> <constructor-arg name="poolConfig" 
+		ref="poolConfig"></constructor-arg> </bean> -->
+
+	<bean id="connectionFactory"
+		class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory">
+		<constructor-arg name="sentinelConfig" ref="sentinelConfiguration"></constructor-arg>
+		<constructor-arg name="poolConfig" ref="poolConfig"></constructor-arg>
+	</bean>
 
 	<bean id="redisTemplate" class="org.springframework.data.redis.core.RedisTemplate">
 		<property name="connectionFactory" ref="jeidsConnectionFactory" />
@@ -61,10 +84,6 @@
 				class="org.springframework.data.redis.serializer.StringRedisSerializer" />
 		</property>
 	</bean>
-
-		<!--  封装redis缓存操作类 实现自接口：ICacheMangerTarget 
-		<bean id="cacheMangerTarget"
-			class="com.xx.xx.db.cache.redis.CacheMangerJedisSentinerAdapter">
-			<constructor-arg index="0" ref="jedisPool" />
-		</bean> -->
+	<!-- <bean id="cacheManager" class="org.springframework.data.redis.cache.RedisCacheManager"></bean>
+ -->
 </beans>
