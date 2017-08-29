@@ -122,17 +122,13 @@
 		</dependency>
 
 		<!-- json -->
-		<dependency>
-			<groupId>org.codehaus.jackson</groupId>
-			<artifactId>jackson-core-asl</artifactId>
-			<version>1.5.5</version>
-		</dependency>
-
+		<!-- https://mvnrepository.com/artifact/org.codehaus.jackson/jackson-mapper-asl -->
 		<dependency>
 			<groupId>org.codehaus.jackson</groupId>
 			<artifactId>jackson-mapper-asl</artifactId>
-			<version>1.5.5</version>
+			<version>1.9.9</version>
 		</dependency>
+
 
 		<dependency>
 			<groupId>org.codehaus.jackson</groupId>
@@ -173,6 +169,13 @@
 			<artifactId>spring-data-redis</artifactId>
 			<version>1.8.3.RELEASE</version>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.springframework.amqp/spring-rabbit -->
+		<dependency>
+			<groupId>org.springframework.amqp</groupId>
+			<artifactId>spring-rabbit</artifactId>
+			<version>1.7.3.RELEASE</version>
+		</dependency>
+
 
 
 	</dependencies>

@@ -42,8 +42,8 @@ public class TestRedis {
 	
 	@Test
 	public void testFun2(){
-		final String key = "key3";
-		final String value = "value3";
+		final String key = "key5";
+		final String value = "value5";
 		 redisTemplate.execute(new RedisCallback<Object>() {  
 	            @Override  
 	            public Object doInRedis(RedisConnection connection)  

@@ -1,7 +1,15 @@
 package com.bqjr.model;
 
-public class EntityName {
-    private String SERIALNO;
+import java.io.Serializable;
+
+public class EntityName implements Serializable {
+    /**
+	 *@Fields serialVersionUID : TODO(用一句话描述这个变量表示什么)    
+	 */
+	
+	private static final long serialVersionUID = 186216532847448351L;
+
+	private String SERIALNO;
 
     private String USERNAME;
 

@@ -18,6 +18,7 @@
 			<list>
 				<value>classpath:jdbc/jdbc.properties</value>
 				<value>classpath:redis/redis.properties</value>
+				<value>classpath:rabbitmq/mq.properties</value>
 			</list>
 		</property>
 	</bean>
@@ -43,4 +44,6 @@
 	<import resource="classpath:dataSource/dataSource.xml"/>
 	<import resource="classpath:mybatis/mybatis.xml"/>
 	<import resource="classpath:redis/redis.xml"/>
+	<import resource="classpath:rabbitmq/rabbitMQ-receive.xml"/>
+	<import resource="classpath:rabbitmq/rabbitMQ-send.xml"/>
 </beans>

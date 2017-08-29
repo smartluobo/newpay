@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:rabbit="http://www.springframework.org/schema/rabbit"
+	xsi:schemaLocation="
+            http://www.springframework.org/schema/beans
+                http://www.springframework.org/schema/beans/spring-beans.xsd
+            http://www.springframework.org/schema/context
+                http://www.springframework.org/schema/context/spring-context.xsd
+            http://www.springframework.org/schema/rabbit
+                http://www.springframework.org/schema/rabbit/spring-rabbit-1.5.xsd">
+	<!-- 连接服务配置：接收代扣平台请求 -->
+	<rabbit:connection-factory id="mqConnectionFactory"
+		host="${mq.receive.host}" username="${mq.receive.user}" password="${mq.receive.password}"
+		port="${mq.receive.port}" virtual-host="${mq.receive.vhost}" />
+		
+	<bean id="rabbitAdmin" class="org.springframework.amqp.rabbit.core.RabbitAdmin">
+		<constructor-arg ref="mqConnectionFactory" />
+	</bean>
+      
+    <!-- queue 消费者-通道声明 ：接收批量签约、代扣的消息 -->	
+	<!-- 签约接收通道： -->
+	<rabbit:queue id="TEST_QUEUE" declared-by="rabbitAdmin" durable="true" auto-delete="false"
+		exclusive="false" name="TEST_QUEUE" />	
+      
+	<!-- 定义数据转换 -->
+	<bean id="jsonMessageConverter"
+		class="org.springframework.amqp.support.converter.JsonMessageConverter"></bean>
+	
+	<!-- 消息接收处理器 -->
+	<bean id="testReceiveService" class="com.bqjr.mq.impl.RabbitMQReceiveServiceImpl" />
+	
+	<!-- 可以获取session的MessageListener -->
+	<!-- queue litener 观察 监听模式 当有消息到达时会通知监听在对应的队列上的监听对象 -->
+	<rabbit:listener-container connection-factory="mqConnectionFactory" acknowledge="auto">
+		<rabbit:listener queues="TEST_QUEUE" ref="testReceiveService" />
+	</rabbit:listener-container>
+</beans>

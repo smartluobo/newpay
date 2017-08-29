@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:rabbit="http://www.springframework.org/schema/rabbit"
+	xsi:schemaLocation="
+            http://www.springframework.org/schema/beans
+                http://www.springframework.org/schema/beans/spring-beans.xsd
+            http://www.springframework.org/schema/context
+                http://www.springframework.org/schema/context/spring-context.xsd
+            http://www.springframework.org/schema/rabbit
+                http://www.springframework.org/schema/rabbit/spring-rabbit-1.5.xsd">
+                
+    <!-- 定义数据转换 -->
+	<bean id="jsonMessageConverter"
+		class="org.springframework.amqp.support.converter.JsonMessageConverter"></bean>
+
+	<!-- 连接服务配置：返回代扣平台请求 -->
+	<rabbit:connection-factory id="mqConnectionFactorySend"
+		host="${mq.send.host}" username="${mq.send.user}" password="${mq.send.password}"
+		port="${mq.send.port}" virtual-host="${mq.send.vhost}" /> 
+
+	<bean id="rabbitAdminSend" class="org.springframework.amqp.rabbit.core.RabbitAdmin">
+		<constructor-arg ref="mqConnectionFactorySend" />
+	</bean>
+
+	<!-- rabbit:测试使用mq-->
+	<rabbit:queue id="TEST_QUEUE" declared-by="rabbitAdminSend" durable="true" auto-delete="false"
+		exclusive="false" name="TEST_QUEUE" />	
+    
+	<!-- 配置线程池 -->
+	<bean id="taskExecutor"
+		class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+		<!-- 线程池维护线程的最少数量 -->
+		<property name="corePoolSize" value="10" />
+		<!-- 线程池维护线程所允许的空闲时间 -->
+		<property name="keepAliveSeconds" value="30000" />
+		<!-- 线程池维护线程的最大数量 -->
+		<property name="maxPoolSize" value="1000" />
+		<!-- 线程池所使用的缓冲队列 -->
+		<property name="queueCapacity" value="200" />
+	</bean>
+	
+	<!-- exchange queue binging key  -->
+	<rabbit:direct-exchange name="TEST_EXCHANGE" declared-by="rabbitAdminSend" durable="true" auto-delete="false" id="TEST_EXCHANGE">
+		<rabbit:bindings>
+			<rabbit:binding queue="TEST_QUEUE" key="TEST_QUEUE_KEY" />
+		</rabbit:bindings>
+	</rabbit:direct-exchange>
+	<!-- spring template声明 -->
+	<rabbit:template exchange="TEST_EXCHANGE" id="sendAmqpTemplate"
+		connection-factory="mqConnectionFactorySend" message-converter="jsonMessageConverter" />
+</beans>
